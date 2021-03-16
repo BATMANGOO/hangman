@@ -13,27 +13,35 @@ def word_grid(word)
   Array.new(word.length - 1, '_')
 end
 
-def play_game # reduce logic into helper funtions
-  word = pick_random_line
-  puts word
+def play_game(word)
+  puts word  # remove this when finished
   arr = word_grid(word)
+  incorrect_letters = []
   mistakes = 0
-  intro # add more dialog towards game progression
+  intro(arr, incorrect_letters, mistakes)
   until mistakes == 6
-    puts mistakes
     input = correct_input(gets.chomp)
-    mistakes += 1 unless check_word(input, word, arr)
-    p arr
-    break if arr.include?('_') == false
+    mistakes += 1 unless check_word(input, word, arr, incorrect_letters)
+    score(arr, incorrect_letters, mistakes)
+    break unless game_over?(arr)
   end
 end
 
-def check_word(input, word, arr) # check for bugs
+def game_over?(arr)
+  if arr.include?('_')
+    true
+  else
+    puts 'Game Over!'
+  end
+end
+
+def check_word(input, word, arr, wrong_words)
   word_split = word.split('')
   word_split.each_with_index do |val, idx|
     if val == input && arr[idx] == '_'
       arr[idx] = input
     elsif !word.include?(input) || (val == input && arr[idx] != '_')
+      wrong_words.push(input)
       return false
     end
   end
@@ -49,4 +57,4 @@ def correct_input(input)
   end
 end
 
-play_game
+play_game(pick_random_line)
