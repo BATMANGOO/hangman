@@ -48,6 +48,14 @@ def check_word(input, word, arr, wrong_words)
   true
 end
 
+def save_game(word, arr)
+
+end
+
+def load_game
+  
+end
+
 def correct_input(input)
   if input.downcase.match(/[a-z]/) && input.length == 1
     input
@@ -58,3 +66,4 @@ def correct_input(input)
 end
 
 play_game(pick_random_line)
+
