@@ -1,9 +1,11 @@
+require 'csv'
 require_relative 'display'
 
 class Hangman
   include Display
   attr_reader :word
   attr_accessor :arr
+
   def initialize
     @word = pick_random_line.downcase
     @arr = word_grid(word)
@@ -15,7 +17,7 @@ class Hangman
     mistakes = 0
     intro(arr, incorrect_letters, mistakes)
     until mistakes == 6
-      input = correct_input(gets.chomp)
+      input = correct_input(gets.chomp.to_s)
       mistakes += 1 unless check_word(input, word, arr, incorrect_letters)
       score(arr, incorrect_letters, mistakes)
       break unless game_over?(arr)
@@ -55,6 +57,11 @@ class Hangman
     elsif input.empty? || input.length > 1
       puts 'Please enter one letter'
       correct_input(gets.chomp)
+    elsif input == '1'
+      save_game
+      puts 'Game Saved!'
+    elsif input == '2'
+      puts 'Function not available yet!'
     end
   end
 
@@ -64,6 +71,25 @@ class Hangman
       pick_random_line
     else
       word
+    end
+  end
+
+  def save_game
+    contents = CSV.open('saved_game.csv', 'w', :write_headers => true, :headers => ["word", "array"]) do |hdr|
+      data_out = [word, arr]
+      hdr << data_out
+    end
+  end
+
+  def load_game
+    content = CSV.open('saved_game.csv', headers: true, header_converters: :symbol)
+
+    content.each do |row|
+      word = row[:word]
+      array = row[:array]
+
+      puts word
+      puts array
     end
   end
 end
