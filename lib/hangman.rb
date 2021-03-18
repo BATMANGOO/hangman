@@ -17,8 +17,8 @@ class Hangman
     mistakes = 0
     intro(arr, incorrect_letters, mistakes)
     until mistakes == 6
-      input = correct_input(gets.chomp.to_s)
-      mistakes += 1 unless check_word(input, word, arr, incorrect_letters)
+      input = gets.chomp
+      input_result(input, word, arr, incorrect_letters, mistakes)
       score(arr, incorrect_letters, mistakes)
       break unless game_over?(arr)
     end
@@ -34,13 +34,14 @@ class Hangman
     end
   end
 
-  def check_word(input, word, arr, wrong_words)
+  def check_word(input, word, arr, wrong_words, mistakes)
     word_split = word.split('')
     word_split.each_with_index do |val, idx|
       if val == input && arr[idx] == '_'
         arr[idx] = input
       elsif !word.include?(input) || (val == input && arr[idx] != '_')
         wrong_words.push(input)
+        mistakes += 1
         return false
       end
     end
@@ -51,17 +52,16 @@ class Hangman
     Array.new(word.length - 1, '_')
   end
 
-  def correct_input(input)
-    if input.downcase.match(/[a-z]/) && input.length == 1
-      input
+  def input_result(input, word, arr, incorrect_letters, mistakes)
+    if input == '1'
+      save_game
+    elsif input == '2'
+      load_game
+    elsif input.downcase.match(/[a-z]/) && input.length == 1
+      check_word(input, word, arr, incorrect_letters, mistakes)
     elsif input.empty? || input.length > 1
       puts 'Please enter one letter'
-      correct_input(gets.chomp)
-    elsif input == '1'
-      save_game
-      puts 'Game Saved!'
-    elsif input == '2'
-      puts 'Function not available yet!'
+      input_result(gets.chomp, word, arr, incorrect_letters, mistakes)
     end
   end
 
@@ -75,10 +75,11 @@ class Hangman
   end
 
   def save_game
-    contents = CSV.open('saved_game.csv', 'w', :write_headers => true, :headers => ["word", "array"]) do |hdr|
+    CSV.open('saved_game.csv', 'w', write_headers: true, headers: ['word', 'array']) do |hdr|
       data_out = [word, arr]
       hdr << data_out
     end
+    puts 'Game Saved!'
   end
 
   def load_game
