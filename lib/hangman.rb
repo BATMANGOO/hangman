@@ -9,14 +9,14 @@ class Hangman
   def initialize
     @word = pick_random_line.downcase
     @arr = word_grid(word)
-    @incorrect_letters = []
+    @incorrect_letters = ''
     @mistakes = 0
   end
 
   def play_game
-    puts word  # remove this when finished
     intro(arr, incorrect_letters, mistakes)
     until mistakes == 6
+      puts word
       input = gets.chomp
       input_result(input)
       score(arr, incorrect_letters, mistakes)
@@ -40,7 +40,7 @@ class Hangman
       if val == input && arr[idx] == '_'
         arr[idx] = input
       elsif !word.include?(input) || (val == input && arr[idx] != '_')
-        incorrect_letters.push(input)
+        @incorrect_letters << append_wrong_words(input, incorrect_letters)
         @mistakes += 1
         return false
       end
@@ -56,7 +56,6 @@ class Hangman
       save_game
     elsif input == '2'
       load_game
-      output
     elsif input.downcase.match(/[a-z]/) && input.length == 1
       check_word(input)
     elsif input.empty? || input.length > 1
@@ -74,6 +73,10 @@ class Hangman
     end
   end
 
+  def append_wrong_words(input, incorrect_letters)
+    incorrect_letters.length < 1 ? "#{input}" : ", #{input}"
+  end
+
   def save_game
     CSV.open('saved_game.csv', 'w', write_headers: true, headers: ['word', 'array', 'mistakes', 'incorrect_letters']) do |hdr|
       data_out = [word, arr, mistakes, incorrect_letters]
@@ -82,27 +85,22 @@ class Hangman
     puts 'Game Saved!'
   end
 
-  def load_game
-    CSV.foreach('saved_game.csv', headers: true, header_converters: :symbol) do |row|
+  def load_game # fix issue of array being returned as a string
+    # CSV.foreach('saved_game.csv', headers: true, header_converters: :symbol) do |row|
+    #   @word = row[:word]
+    #   @arr = row[:array]
+    #   @incorrect_letters = row[:incorrect_letters]
+    #   @mistakes = row[:mistakes].to_i
+    # end
+
+    content.each do |row|
       @word = row[:word]
       @arr = row[:array]
       @incorrect_letters = row[:incorrect_letters]
-      @mistakes = row[:mistakes]
+      @mistakes = row[:mistakes].to_i
     end
-
-    # content.each do |row|
-      # @word = row[:word]
-      # @arr = row[:array]
-      # @incorrect_letters = row[:incorrect_letters]
-      # @mistakes = row[:mistakes]
-    # end
-    # puts @incorrect_letters
+    puts @incorrect_letters
     puts 'Save Loaded!'
-  end
-
-  def output 
-    puts incorrect_letters
-    puts arr
   end
 end
 
