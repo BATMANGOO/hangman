@@ -1,15 +1,18 @@
 require 'csv'
+require 'yaml'
 require_relative 'display'
+require_relative 'conditions'
 
 class Hangman
   include Display
+  include Conditions
   attr_reader :word
   attr_accessor :arr, :mistakes, :incorrect_letters
 
   def initialize
     @word = pick_random_line.downcase
     @arr = word_grid(word)
-    @incorrect_letters = ''
+    @incorrect_letters = []
     @mistakes = 0
   end
 
@@ -40,7 +43,7 @@ class Hangman
       if val == input && arr[idx] == '_'
         arr[idx] = input
       elsif !word.include?(input) || (val == input && arr[idx] != '_')
-        @incorrect_letters << append_wrong_words(input, incorrect_letters)
+        @incorrect_letters.push(input)
         @mistakes += 1
         return false
       end
@@ -73,15 +76,16 @@ class Hangman
     end
   end
 
-  def append_wrong_words(input, incorrect_letters)
-    incorrect_letters.length < 1 ? "#{input}" : ", #{input}"
-  end
-
-  def save_game
-    CSV.open('saved_game.csv', 'w', write_headers: true, headers: ['word', 'array', 'mistakes', 'incorrect_letters']) do |hdr|
-      data_out = [word, arr, mistakes, incorrect_letters]
-      hdr << data_out
+  def save_game # work on this
+    # CSV.open('saved_game.csv', 'w', write_headers: true, headers: ['word', 'array', 'mistakes', 'incorrect_letters']) do |hdr|
+    #   data_out = [word, arr, mistakes, incorrect_letters]
+    #   hdr << data_out
+    # end
+    File.open('saved_game.yml', 'w') do |file|
+      file.write(self)
     end
+
+
     puts 'Game Saved!'
   end
 
@@ -93,13 +97,16 @@ class Hangman
     #   @mistakes = row[:mistakes].to_i
     # end
 
-    content.each do |row|
-      @word = row[:word]
-      @arr = row[:array]
-      @incorrect_letters = row[:incorrect_letters]
-      @mistakes = row[:mistakes].to_i
-    end
-    puts @incorrect_letters
+    # content = CSV.open('saved_game.csv', headers: true, header_converters: :symbol)
+
+    # content.each do |row|
+    #   @word = row[:word]
+    #   @arr = row[:array]
+    #   @incorrect_letters = row[:incorrect_letters]
+    #   @mistakes = row[:mistakes].to_i
+    # end
+
+    YAML.load(File.read('saved_game.yml'))
     puts 'Save Loaded!'
   end
 end
