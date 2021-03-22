@@ -21,6 +21,7 @@ class Hangman
       score(arr, incorrect_letters, mistakes)
       break unless game_over?(arr)
     end
+    play_again
   end
 
   private
@@ -31,6 +32,17 @@ class Hangman
       true
     else
       puts 'Game Over!'
+    end
+  end
+
+  def play_again
+    puts 'would you like to play again? y or n?'
+    input = gets.chomp.downcase
+    if input == 'y'
+      reset
+      play_game
+    else
+      puts 'have a great day!'
     end
   end
 
@@ -71,6 +83,13 @@ class Hangman
     else
       word
     end
+  end
+
+  def reset
+    @word = pick_random_line.downcase
+    @arr = word_grid(word)
+    @incorrect_letters = []
+    @mistakes = 0
   end
 
   def save_game
