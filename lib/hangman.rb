@@ -16,7 +16,6 @@ class Hangman
   def play_game
     intro(arr, incorrect_letters, mistakes)
     until mistakes == 6
-      puts word
       input = gets.chomp
       input_result(input)
       score(arr, incorrect_letters, mistakes)
