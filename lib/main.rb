@@ -1,6 +1,8 @@
 require_relative './hangman'
 
 def main
-  game = hangman.new
+  game = Hangman.new
   game.play_game
 end
+
+main

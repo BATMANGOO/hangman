@@ -87,3 +87,6 @@ class Hangman
     puts 'Save Loaded!'
   end
 end
+
+game = Hangman.new
+game.play_game
